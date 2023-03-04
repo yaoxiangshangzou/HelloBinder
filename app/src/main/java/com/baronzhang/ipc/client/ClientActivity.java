@@ -20,6 +20,9 @@ import com.baronzhang.ipc.server.Stub;
 
 import java.util.List;
 
+/**
+ * client
+ */
 public class ClientActivity extends AppCompatActivity {
 
     private BookManager bookManager;
@@ -45,10 +48,14 @@ public class ClientActivity extends AppCompatActivity {
                 try {
                     Book book = new Book();
                     book.setPrice(101);
-                    book.setName("编码");
+                    book.setName("编码  来自客户端");
+//                    addBook()   如果 Client 和 Server 在同一个进程，那么直接就是调用这个方法。
+//                    如果是远程调用，Client 想要调用 Server 的方法就需要通过 Binder 代理来完成，也就是上面的 Proxy。
+
+//                    Client 进程通过系统调用陷入内核态，Client 进程中执行 addBook() 的线程挂起等待返回
                     bookManager.addBook(book);
 
-                    Log.d("ClientActivity", bookManager.getBooks().toString());
+                    Log.d("ClientActivity=====1", bookManager.getBooks().toString());
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -68,11 +75,14 @@ public class ClientActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             isConnection = true;
+            //asInterface(IBinder binder) 拿到 BookManager 对象，这个 IBinder 类型的入参 binder 是驱动传给我们的
             bookManager = Stub.asInterface(service);
             if (bookManager != null) {
                 try {
+//                    调用了 Binder 本地对象的 addBook() 并将结果返回给驱动，
+//                    驱动唤醒 Client 进程里刚刚挂起的线程并将结果返回
                     List<Book> books = bookManager.getBooks();
-                    Log.d("ClientActivity", books.toString());
+                    Log.d("ClientActivity=====2", books.toString());
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

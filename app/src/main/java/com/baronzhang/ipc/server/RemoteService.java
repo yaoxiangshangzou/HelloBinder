@@ -11,6 +11,9 @@ import com.baronzhang.ipc.Book;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * server
+ */
 public class RemoteService extends Service {
 
     private List<Book> books = new ArrayList<>();
@@ -23,7 +26,7 @@ public class RemoteService extends Service {
         super.onCreate();
 
         Book book = new Book();
-        book.setName("三体");
+        book.setName("三体  服务端");
         book.setPrice(88);
         books.add(book);
     }
@@ -36,6 +39,8 @@ public class RemoteService extends Service {
     private final Stub bookManager = new Stub() {
         @Override
         public List<Book> getBooks() throws RemoteException {
+            Log.e("Server", "  getBooks " );
+
             synchronized (this) {
                 if (books != null) {
                     return books;
